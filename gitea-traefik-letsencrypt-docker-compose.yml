@@ -24,7 +24,7 @@ volumes:
 services:
   postgres:
     # Image tag (replace with yours)
-    image: postgres:13.2
+    image: postgres:14
     volumes:
       - gitea-postgres:/var/lib/postgresql/data
     environment:
@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
 
   gitea:
-    image: gitea/gitea:1.14
+    image: gitea/gitea:1.17
     volumes:
       - gitea-data:/data
       - gitea-config:/etc/gitea
@@ -91,7 +91,7 @@ services:
 
   traefik:
     # Image tag (replace with yours)
-    image: traefik:2.4
+    image: traefik:2.8
     command:
       - "--log.level=WARN"
       - "--accesslog=true"
@@ -148,7 +148,7 @@ services:
 
   backups:
     # Image tag (replace with yours)
-    image: postgres:13.2
+    image: postgres:14
     # Database backups prune interval (replace with yours). Default is 7 days.
     # find /srv/gitea-postgres/backups -type f -mtime +7 | xargs rm -f
 
