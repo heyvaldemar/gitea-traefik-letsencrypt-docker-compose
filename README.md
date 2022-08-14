@@ -8,7 +8,7 @@ Run `gitea-restore-database.sh` to restore database if needed.
 
 Deploy Gitea server with a Docker Compose using the command:
 
-`docker-compose -f gitea-traefik-letsencrypt-docker-compose.yml -p gitea up -d`
+`docker compose -f gitea-traefik-letsencrypt-docker-compose.yml -p gitea up -d`
 
 # Author
 hey, I’m Vladimir Mikhalev, but my friends call me Valdemar.
