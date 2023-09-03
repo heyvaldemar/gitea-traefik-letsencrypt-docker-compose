@@ -15,7 +15,7 @@
 GITEA_CONTAINER=$(docker ps -aqf "name=gitea-gitea")
 GITEA_BACKUPS_CONTAINER=$(docker ps -aqf "name=gitea-backups")
 BACKUP_PATH="/srv/gitea-application-data/backups/"
-RESTORE_PATH="/gitea/data/"
+RESTORE_PATH="/bitnami/gitea/"
 BACKUP_PREFIX="gitea-application-data"
 
 echo "--> All available application data backups:"
