@@ -182,7 +182,18 @@ The [Deployment Verification](https://github.com/heyvaldemar/gitea-traefik-letse
 3. **Pin freshness** (weekly/manual) — digest drift plus release-lag checks for Gitea and Traefik.
 4. **Deploy-and-test** — boots the full stack with ephemeral credentials and requires `/api/healthz` to answer `pass` through Traefik plus a 200 front page — the shipped configuration must produce a working forge, not just started containers.
 
-A green run is the authoritative proof that the template deploys end-to-end.
+A green run is the authoritative proof that the template deploys end-to-end and that its backups restore.
+
+### Backup and restore, proven
+
+`tests/e2e-backup-restore.sh` runs against the live stack and is what CI executes after the HTTPS smoke. The scenario that matters most is the restore roundtrip: insert a marker row, restore the earliest backup, assert the marker is gone — a backup that cannot be restored fails the build. Run it yourself against a running deployment with short intervals in `.env` (`BACKUP_INIT_SLEEP=15s`, `BACKUP_INTERVAL=60s`):
+
+```bash
+chmod +x tests/e2e-backup-restore.sh
+./tests/e2e-backup-restore.sh
+```
+
+It stops the database container briefly to prove failure detection — run it on a staging copy, not on production.
 
 ## Security Notes
 
