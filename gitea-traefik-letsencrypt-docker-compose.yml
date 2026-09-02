@@ -27,6 +27,16 @@ volumes:
 services:
   postgres:
     image: *postgres-image
+    # Resource limits as .env-overridable defaults (e.g. GITEA_POSTGRES_MEMORY_LIMIT=2g);
+    # the override survives every git pull.
+    deploy:
+      resources:
+        limits:
+          memory: ${GITEA_POSTGRES_MEMORY_LIMIT:-1g}
+          cpus: "${GITEA_POSTGRES_CPU_LIMIT:-1.0}"
+        reservations:
+          memory: ${GITEA_POSTGRES_MEMORY_RESERVATION:-128m}
+          cpus: "${GITEA_POSTGRES_CPU_RESERVATION:-0.25}"
     volumes:
       - gitea-postgres:/var/lib/postgresql/data
     environment:
@@ -45,6 +55,16 @@ services:
 
   gitea:
     image: *gitea-image
+    # Resource limits as .env-overridable defaults (e.g. GITEA_MEMORY_LIMIT=2g);
+    # the override survives every git pull.
+    deploy:
+      resources:
+        limits:
+          memory: ${GITEA_MEMORY_LIMIT:-512m}
+          cpus: "${GITEA_CPU_LIMIT:-1.0}"
+        reservations:
+          memory: ${GITEA_MEMORY_RESERVATION:-64m}
+          cpus: "${GITEA_CPU_RESERVATION:-0.25}"
     volumes:
       - gitea-data:${DATA_PATH:-/data}
       - /etc/timezone:/etc/timezone:ro
@@ -111,6 +131,16 @@ services:
 
   traefik:
     image: *traefik-image
+    # Resource limits as .env-overridable defaults (e.g. TRAEFIK_MEMORY_LIMIT=2g);
+    # the override survives every git pull.
+    deploy:
+      resources:
+        limits:
+          memory: ${TRAEFIK_MEMORY_LIMIT:-256m}
+          cpus: "${TRAEFIK_CPU_LIMIT:-0.5}"
+        reservations:
+          memory: ${TRAEFIK_MEMORY_RESERVATION:-64m}
+          cpus: "${TRAEFIK_CPU_RESERVATION:-0.1}"
     command:
       # Set the log level (DEBUG, INFO, WARN, ERROR)
       - "--log.level=${TRAEFIK_LOG_LEVEL:-WARN}"
@@ -185,6 +215,16 @@ services:
 
   backups:
     image: *postgres-image
+    # Resource limits as .env-overridable defaults (e.g. GITEA_BACKUPS_MEMORY_LIMIT=2g);
+    # the override survives every git pull.
+    deploy:
+      resources:
+        limits:
+          memory: ${GITEA_BACKUPS_MEMORY_LIMIT:-256m}
+          cpus: "${GITEA_BACKUPS_CPU_LIMIT:-0.5}"
+        reservations:
+          memory: ${GITEA_BACKUPS_MEMORY_RESERVATION:-32m}
+          cpus: "${GITEA_BACKUPS_CPU_RESERVATION:-0.1}"
     command: >-
       bash -c 'set -o pipefail;
       sleep "$$BACKUP_INIT_SLEEP";
