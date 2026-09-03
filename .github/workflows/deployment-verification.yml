@@ -79,7 +79,7 @@ jobs:
         env:
           ENV_VAR: ${{ matrix.env_var }}
         run: |
-          image="$(grep -m1 -oE "\\$\\{${ENV_VAR}:-.*" gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z_]+:-([^{}]*)\}/\1/' -e 'ta')"
+          image="$(grep -m1 -oE "\\$\\{${ENV_VAR}:-.*" gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z0-9_]+:-([^{}]*)\}/\1/' -e 'ta')"
           if [ -z "$image" ]; then
             echo "${ENV_VAR} default not found in the compose x-images block" >&2
             exit 1
@@ -123,7 +123,7 @@ jobs:
         run: |
           status=0
           for var in GITEA_POSTGRES_IMAGE_TAG GITEA_IMAGE_TAG TRAEFIK_IMAGE_TAG; do
-            pin="$(grep -m1 -oE "\\$\\{${var}:-.*" gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z_]+:-([^{}]*)\}/\1/' -e 'ta')"
+            pin="$(grep -m1 -oE "\\$\\{${var}:-.*" gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z0-9_]+:-([^{}]*)\}/\1/' -e 'ta')"
             ref="${pin%%@*}"
             pinned_digest="${pin##*@}"
             current_digest="$(docker buildx imagetools inspect "$ref" --format '{{json .Manifest}}' | jq -r .digest)"
@@ -138,7 +138,7 @@ jobs:
 
       - name: Compare pinned Gitea version against the latest release
         run: |
-          pin="$(grep -m1 -oE '\$\{GITEA_IMAGE_TAG:-.*' gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z_]+:-([^{}]*)\}/\1/' -e 'ta')"
+          pin="$(grep -m1 -oE '\$\{GITEA_IMAGE_TAG:-.*' gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z0-9_]+:-([^{}]*)\}/\1/' -e 'ta')"
           ref="${pin%%@*}"
           pinned_version="${ref##*:}"
           latest="$(curl -fsSL --retry 3 -H "Authorization: Bearer $GH_API_TOKEN" https://api.github.com/repos/go-gitea/gitea/releases/latest | jq -r .tag_name)"
@@ -155,7 +155,7 @@ jobs:
 
       - name: Compare pinned Traefik minor against the latest release
         run: |
-          pin="$(grep -m1 -oE '\$\{TRAEFIK_IMAGE_TAG:-.*' gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z_]+:-([^{}]*)\}/\1/' -e 'ta')"
+          pin="$(grep -m1 -oE '\$\{TRAEFIK_IMAGE_TAG:-.*' gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z0-9_]+:-([^{}]*)\}/\1/' -e 'ta')"
           ref="${pin%%@*}"
           pinned_minor="${ref##*:}"
           latest="$(curl -fsSL --retry 3 -H "Authorization: Bearer $GH_API_TOKEN" https://api.github.com/repos/traefik/traefik/releases/latest | jq -r .tag_name)"
