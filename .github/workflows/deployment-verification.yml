@@ -138,7 +138,7 @@ jobs:
 
       - name: Compare pinned Gitea version against the latest release
         run: |
-          pin="$(grep -oE '\$\{GITEA_IMAGE_TAG:-[^}]+\}' gitea-traefik-letsencrypt-docker-compose.yml | head -1 | sed -E 's/^\$\{GITEA_IMAGE_TAG:-//; s/\}$//')"
+          pin="$(grep -m1 -oE '\$\{GITEA_IMAGE_TAG:-.*' gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z_]+:-([^{}]*)\}/\1/' -e 'ta')"
           ref="${pin%%@*}"
           pinned_version="${ref##*:}"
           latest="$(curl -fsSL --retry 3 -H "Authorization: Bearer $GH_API_TOKEN" https://api.github.com/repos/go-gitea/gitea/releases/latest | jq -r .tag_name)"
@@ -155,7 +155,7 @@ jobs:
 
       - name: Compare pinned Traefik minor against the latest release
         run: |
-          pin="$(grep -oE '\$\{TRAEFIK_IMAGE_TAG:-[^}]+\}' gitea-traefik-letsencrypt-docker-compose.yml | head -1 | sed -E 's/^\$\{TRAEFIK_IMAGE_TAG:-//; s/\}$//')"
+          pin="$(grep -m1 -oE '\$\{TRAEFIK_IMAGE_TAG:-.*' gitea-traefik-letsencrypt-docker-compose.yml | sed -E -e ':a' -e 's/\$\{[A-Z_]+:-([^{}]*)\}/\1/' -e 'ta')"
           ref="${pin%%@*}"
           pinned_minor="${ref##*:}"
           latest="$(curl -fsSL --retry 3 -H "Authorization: Bearer $GH_API_TOKEN" https://api.github.com/repos/traefik/traefik/releases/latest | jq -r .tag_name)"
