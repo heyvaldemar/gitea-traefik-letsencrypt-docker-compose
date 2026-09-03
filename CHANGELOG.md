@@ -51,7 +51,7 @@ _(no unreleased changes yet)_
 
 ### Added
 
-- **`tests/e2e-backup-restore.sh`** — seven end-to-end scenarios against
+- **`tests/e2e-backup-restore.sh`**: seven end-to-end scenarios against
   the live stack, run by CI on every push and by you locally: the
   required-variable guard fires, a backup is produced, it is a readable
   archive with real dump content (and a readable data `tar.gz` where the
@@ -93,7 +93,7 @@ v1.2.0.
   with generation commands, and the compose file fails fast via `${VAR:?}`
   when required secrets are unset.
 - **Gitea bumped 1.25 → 1.27.3** (`gitea/gitea:1.27.3@sha256:87a67ee0…`).
-- **Traefik bumped 3.2 → 3.7** — Traefik 3.2's Docker client cannot talk
+- **Traefik bumped 3.2 → 3.7**: Traefik 3.2's Docker client cannot talk
   to Docker Engine 29 (provider retry loop, silent 404s on current hosts).
 - **All three images pinned by `tag@sha256:digest`** (`postgres:15`
   digest-pinned; PostgreSQL major deliberately unchanged).
@@ -103,7 +103,7 @@ v1.2.0.
 - **Image pins live in the compose file as interpolation defaults**
   (`x-images` block): `git pull` alone delivers the tested version
   combination; `.env` carries only secrets and deliberate overrides.
-- Operational variables now have compose-level defaults — the minimal
+- Operational variables now have compose-level defaults: the minimal
   `.env` is secrets and hostnames only.
 - Backup-loop variables escaped (`$$VAR`) for runtime resolution.
 

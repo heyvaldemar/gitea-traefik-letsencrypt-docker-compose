@@ -1,4 +1,4 @@
-# Gitea + Traefik + Let's Encrypt — Docker Compose
+# Gitea + Traefik + Let's Encrypt on Docker Compose
 
 [![Deployment Verification](https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml/badge.svg?branch=main)](https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -44,8 +44,8 @@ Before you start, you need:
 
 - **A Linux server** with a public IP. Tested on Ubuntu 22.04 LTS+ and Debian 12+. Local Mac/Windows works for dev; production is Linux.
 - **Docker Engine 24+ and Docker Compose 2.20+.** Quick check: `docker version` and `docker compose version`.
-- **A domain you control,** with two `A` records pointing at your server's public IP — one for Gitea (e.g. `gitea.example.com`), one for the Traefik dashboard (e.g. `traefik.gitea.example.com`). DNS must propagate before deploy or the Let's Encrypt TLS-ALPN challenge will fail.
-- **Ports 80, 443, and 2222 open** — 2222 carries git-over-SSH (configurable via `GITEA_SHELL_SSH_PORT`).
+- **A domain you control,** with two `A` records pointing at your server's public IP: one for Gitea (e.g. `gitea.example.com`), one for the Traefik dashboard (e.g. `traefik.gitea.example.com`). DNS must propagate before deploy or the Let's Encrypt TLS-ALPN challenge will fail.
+- **Ports 80, 443, and 2222 open**: 2222 carries git-over-SSH (configurable via `GITEA_SHELL_SSH_PORT`).
 - **~1 GB free RAM and 1 free CPU** for the running stack, plus disk for repositories and backup retention.
 
 ## Getting started
@@ -104,21 +104,21 @@ docker compose -f gitea-traefik-letsencrypt-docker-compose.yml -p gitea up -d --
 
 ## Features
 
-- **Gitea** latest stable (1.27.3) — repositories, issues, pull requests, actions, packages.
+- **Gitea** latest stable (1.27.3): repositories, issues, pull requests, actions, packages.
 - **PostgreSQL** backing store with healthcheck and start-order dependency.
 - **Traefik v3** reverse proxy with automatic HTTP→HTTPS redirect and Let's Encrypt TLS-ALPN certificate issuance.
-- **Git-over-SSH via a dedicated Traefik TCP entrypoint** on port 2222 — no host-level SSH conflicts.
+- **Git-over-SSH via a dedicated Traefik TCP entrypoint** on port 2222: no host-level SSH conflicts.
 - **Bootstrap admin auto-created** from env on first run.
 - **Basic-auth protected Traefik dashboard** on a separate hostname.
 - **Scheduled backups** of the database (`pg_dump | gzip`) and repository data (`tar.gz`) with retention pruning, plus restore scripts for both.
-- **Credentials required at deploy time** — compose fails fast if `.env` is incomplete.
+- **Credentials required at deploy time**: compose fails fast if `.env` is incomplete.
 
 ### Typical use cases
 
-- **Self-hosted GitHub alternative** — code on your own hardware, including private mirrors.
-- **CI target for homelabs** — Gitea Actions is workflow-compatible with a large part of the GitHub Actions ecosystem.
-- **Internal forge for a small team** — lightweight (a fraction of GitLab's footprint) with the features that matter.
-- **Air-gapped or compliance-bound development** — data residency without SaaS.
+- **Self-hosted GitHub alternative**: code on your own hardware, including private mirrors.
+- **CI target for homelabs**: Gitea Actions is workflow-compatible with a large part of the GitHub Actions ecosystem.
+- **Internal forge for a small team**: lightweight (a fraction of GitLab's footprint) with the features that matter.
+- **Air-gapped or compliance-bound development**: data residency without SaaS.
 
 ## SSH access to repositories
 
@@ -134,13 +134,13 @@ Add your public key in Gitea (Settings → SSH / GPG Keys) first. HTTPS clones w
 
 This repository is a **deployment template**, not a custom Docker image. It orchestrates three upstream images:
 
-- [`traefik`](https://hub.docker.com/_/traefik) — reverse proxy, Docker Hub official image
-- [`gitea/gitea`](https://hub.docker.com/r/gitea/gitea) — Gitea upstream
-- [`postgres`](https://hub.docker.com/_/postgres) — PostgreSQL, Docker Hub official image
+- [`traefik`](https://hub.docker.com/_/traefik): reverse proxy, Docker Hub official image
+- [`gitea/gitea`](https://hub.docker.com/r/gitea/gitea): Gitea upstream
+- [`postgres`](https://hub.docker.com/_/postgres): PostgreSQL, Docker Hub official image
 
-All three are pinned to `tag@sha256:<digest>` as interpolation defaults in the compose file's `x-images` block. Compose pulls by digest, not by tag — and `git pull` alone delivers the version combination this repository has tested. Setting an `*_IMAGE_TAG` variable in `.env` overrides the default when you deliberately want a different version.
+All three are pinned to `tag@sha256:<digest>` as interpolation defaults in the compose file's `x-images` block. Compose pulls by digest, not by tag, and `git pull` alone delivers the version combination this repository has tested. Setting an `*_IMAGE_TAG` variable in `.env` overrides the default when you deliberately want a different version.
 
-The daily `check-pin-freshness` CI job re-resolves each pinned tag against its registry and compares the pinned Gitea and Traefik versions against the latest upstream releases — any drift fails the run and notifies the maintainer. CI's **Deployment Verification** workflow runs on every push, pull request, and every day at 06:00 UTC. GitHub Actions are pinned by commit SHA; Dependabot keeps those fresh.
+The daily `check-pin-freshness` CI job re-resolves each pinned tag against its registry and compares the pinned Gitea and Traefik versions against the latest upstream releases. Any drift fails the run and notifies the maintainer. CI's **Deployment Verification** workflow runs on every push, pull request, and every day at 06:00 UTC. GitHub Actions are pinned by commit SHA; Dependabot keeps those fresh.
 
 ## Production checklist
 
@@ -148,7 +148,7 @@ Before exposing this to real users, check every box:
 
 - [ ] **Strong secrets.** `GITEA_DB_PASSWORD` and `GITEA_ADMIN_PASSWORD` at 24+ random characters; regenerate the Traefik dashboard BCrypt hash per deployment.
 - [ ] **Disable open registration** unless the forge is meant to be public: Site Administration → Authentication, or set `GITEA__service__DISABLE_REGISTRATION: true` on the gitea service.
-- [ ] **Host-mount the backup volumes** for disaster recovery — bind the backup paths to host directories covered by your off-host backup solution.
+- [ ] **Host-mount the backup volumes** for disaster recovery: bind the backup paths to host directories covered by your off-host backup solution.
 - [ ] **Verify Let's Encrypt cert issuance** in the Traefik logs on first start.
 - [ ] **Know the restore procedure.** Run both restore scripts against a test environment before you need them in production.
 - [ ] **Back up before upgrades.** Gitea migrates its schema forward automatically; the way back is a restore.
@@ -157,7 +157,7 @@ Before exposing this to real users, check every box:
 
 The `backups` container performs a dump → archive → prune → sleep loop: `pg_dump | gzip` of the database, `tar.gz` of the repository data directory, pruning by retention windows, then sleeping `BACKUP_INTERVAL` (default 24h). All knobs are configured via `.env` with compose-level defaults.
 
-Each cycle logs `Database backup OK: <file> (<bytes> bytes)` or `Database backup FAILED` (the same for the data archive where there is one). A failed dump is kept as `<file>.failed` for diagnosis and never overwrites a good backup — grep the log for `FAILED` from your monitoring.
+Each cycle logs `Database backup OK: <file> (<bytes> bytes)` or `Database backup FAILED` (the same for the data archive where there is one). A failed dump is kept as `<file>.failed` for diagnosis and never overwrites a good backup. Grep the log for `FAILED` from your monitoring.
 
 **Verify backups are running:**
 
@@ -175,7 +175,7 @@ docker compose -p gitea exec backups sh -c 'ls -la /srv/gitea-postgres/backups/ 
 
 ## Resource limits
 
-Every service carries memory and CPU limits plus reservations as compose-level defaults — the same values CI boots the stack under. Override any of them in `.env` (the knobs and their defaults are listed in `.env.example`, e.g. `TRAEFIK_MEMORY_LIMIT=512m`) and the override survives every `git pull`. If a service is OOM-killed under real load, `docker inspect <container> --format '{{.State.OOMKilled}}'` says so; raise its `_MEMORY_LIMIT` and recreate.
+Every service carries memory and CPU limits plus reservations as compose-level defaults: the same values CI boots the stack under. Override any of them in `.env` (the knobs and their defaults are listed in `.env.example`, e.g. `TRAEFIK_MEMORY_LIMIT=512m`) and the override survives every `git pull`. If a service is OOM-killed under real load, `docker inspect <container> --format '{{.State.OOMKilled}}'` says so; raise its `_MEMORY_LIMIT` and recreate.
 
 ## Container hardening
 
@@ -185,23 +185,23 @@ Every service runs with `security_opt: no-new-privileges:true`, so a process can
 
 The [Deployment Verification](https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/actions/workflows/deployment-verification.yml?query=branch%3Amain) workflow runs on every push, pull request, and every day at 06:00 UTC:
 
-1. **Lint** — shellcheck on both restore scripts, actionlint on the workflow.
+1. **Lint**: shellcheck on both restore scripts, actionlint on the workflow.
 2. **Trivy scans** of all three pinned images (CRITICAL/HIGH, SARIF to the Security tab).
-3. **Pin freshness** (daily/manual) — digest drift plus release-lag checks for Gitea and Traefik.
-4. **Deploy-and-test** — boots the full stack with ephemeral credentials and requires `/api/healthz` to answer `pass` through Traefik plus a 200 front page — the shipped configuration must produce a working forge, not just started containers.
+3. **Pin freshness** (daily/manual): digest drift plus release-lag checks for Gitea and Traefik.
+4. **Deploy-and-test**: boots the full stack with ephemeral credentials and requires `/api/healthz` to answer `pass` through Traefik plus a 200 front page. The shipped configuration must produce a working forge, not just started containers.
 
 A green run is the authoritative proof that the template deploys end-to-end and that its backups restore.
 
 ### Backup and restore, proven
 
-`tests/e2e-backup-restore.sh` runs against the live stack and is what CI executes after the HTTPS smoke. The scenario that matters most is the restore roundtrip: insert a marker row, restore the earliest backup, assert the marker is gone — a backup that cannot be restored fails the build. Run it yourself against a running deployment with short intervals in `.env` (`BACKUP_INIT_SLEEP=15s`, `BACKUP_INTERVAL=60s`):
+`tests/e2e-backup-restore.sh` runs against the live stack and is what CI executes after the HTTPS smoke. The scenario that matters most is the restore roundtrip: insert a marker row, restore the earliest backup, assert the marker is gone. A backup that cannot be restored fails the build. Run it yourself against a running deployment with short intervals in `.env` (`BACKUP_INIT_SLEEP=15s`, `BACKUP_INTERVAL=60s`):
 
 ```bash
 chmod +x tests/e2e-backup-restore.sh
 ./tests/e2e-backup-restore.sh
 ```
 
-It stops the database container briefly to prove failure detection — run it on a staging copy, not on production.
+It stops the database container briefly to prove failure detection. Run it on a staging copy, not on production.
 
 ## Security Notes
 
@@ -216,7 +216,7 @@ It stops the database container briefly to prove failure detection — run it on
 
 <div align="center">
 
-**Maintained by [Vladimir Mikhalev](https://github.com/heyvaldemar)** — Docker Captain · IBM Champion · AWS Community Builder
+**Maintained by [Vladimir Mikhalev](https://github.com/heyvaldemar)** · Docker Captain · IBM Champion · AWS Community Builder
 
 [YouTube](https://www.youtube.com/channel/UCf85kQ0u1sYTTTyKVpxrlyQ?sub_confirmation=1) · [Blog](https://heyvaldemar.com) · [LinkedIn](https://www.linkedin.com/in/heyvaldemar/)
 
