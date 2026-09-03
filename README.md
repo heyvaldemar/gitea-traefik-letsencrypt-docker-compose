@@ -18,7 +18,7 @@
 - [Security Notes](#security-notes)
 - [About the maintainer](#about-the-maintainer)
 
-This repository deploys **Gitea** behind **Traefik** with automatic **Let's Encrypt TLS**, backed by **PostgreSQL**, with git-over-SSH routed through a dedicated Traefik TCP entrypoint, a scheduled **backup container** (database + repositories), and companion **restore scripts**. One `docker compose up` away from a self-hosted software forge at `https://your-domain`.
+This repository deploys Gitea behind Traefik with automatic Let's Encrypt TLS, backed by PostgreSQL, with git-over-SSH routed through a dedicated Traefik TCP entrypoint, a scheduled backup container (database + repositories), and companion restore scripts. One `docker compose up` away from a self-hosted software forge at `https://your-domain`.
 
 📙 Full narrative installation guide on the blog: [heyvaldemar.com/install-gitea-using-docker-compose/](https://www.heyvaldemar.com/install-gitea-using-docker-compose/).
 
@@ -132,7 +132,7 @@ Add your public key in Gitea (Settings → SSH / GPG Keys) first. HTTPS clones w
 
 ## Supply chain trust
 
-This repository is a **deployment template**, not a custom Docker image. It orchestrates three upstream images:
+This repository is a deployment template, not a custom Docker image. It orchestrates three upstream images:
 
 - [`traefik`](https://hub.docker.com/_/traefik): reverse proxy, Docker Hub official image
 - [`gitea/gitea`](https://hub.docker.com/r/gitea/gitea): Gitea upstream
@@ -142,7 +142,7 @@ All three are pinned to `tag@sha256:<digest>` as interpolation defaults in the c
 
 Two override levels exist per image. `<PREFIX>_IMAGE_VERSION` in `.env` swaps only the version of that image (Compose then pulls the tag, without a digest) and leaves every other pin as tested; `<PREFIX>_IMAGE_TAG` replaces the whole reference, digest included. The variable names are listed in `.env.example`. Nested defaults need Docker Compose v2.5 or newer (2022); v2.0 to v2.4 leave the inner `${...}` unexpanded and `docker compose up` fails with an invalid reference instead of deploying something unexpected.
 
-The daily `check-pin-freshness` CI job re-resolves each pinned tag against its registry and compares the pinned Gitea and Traefik versions against the latest upstream releases. Any drift fails the run and notifies the maintainer. CI's **Deployment Verification** workflow runs on every push, pull request, and every day at 06:00 UTC. GitHub Actions are pinned by commit SHA; Dependabot keeps those fresh.
+The daily `check-pin-freshness` CI job re-resolves each pinned tag against its registry and compares the pinned Gitea and Traefik versions against the latest upstream releases. Any drift fails the run and notifies the maintainer. CI's Deployment Verification workflow runs on every push, pull request, and every day at 06:00 UTC. GitHub Actions are pinned by commit SHA; Dependabot keeps those fresh.
 
 ## Production checklist
 
@@ -205,7 +205,7 @@ chmod +x tests/e2e-backup-restore.sh
 
 It stops the database container briefly to prove failure detection. Run it on a staging copy, not on production.
 
-## Security Notes
+## Security notes
 
 - Credentials are read from `.env` at deploy time; `.env` is gitignored and compose fails fast on missing required variables.
 - **Pre-rotation advisory.** Releases before v1.0.0 (2026-08-31) shipped a tracked `.env` with generated-looking passwords. Rotate `GITEA_DB_PASSWORD` and `GITEA_ADMIN_PASSWORD` if your deployment reused them.
