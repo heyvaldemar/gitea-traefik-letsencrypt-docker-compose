@@ -172,9 +172,9 @@ test_backup_created() {
   wait_for_first_backup 180 || { fail "no backup appeared within 180s"; return 1; }
   local first size
   first=$(list_backups | head -1)
-  size=$(backups_sh "stat -c %s $newest" | tr -d '[:space:]')
-  [[ -n "$size" && "$size" -gt 0 ]] || { fail "backup $newest has size '$size'"; return 1; }
-  echo "  first backup: $newest ($size bytes)"
+  size=$(backups_sh "stat -c %s $first" | tr -d '[:space:]')
+  [[ -n "$size" && "$size" -gt 0 ]] || { fail "backup $first has size '$size'"; return 1; }
+  echo "  first backup: $first ($size bytes)"
 }
 
 test_backup_gunzip_ok() {
