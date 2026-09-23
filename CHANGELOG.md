@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **The application data restore merged instead of restoring.** It cleared
+  `/bitnami/gitea/`, a path this stack does not have, then unpacked the archive
+  over the live `/data`, so files created after the backup survived it. The
+  database restore carried the database name, user and backup directory as
+  literals, wrong for any `.env` that sets them differently.
+  Both scripts now take every path, name and credential from the running
+  backups container, accept the backup file name as an argument, stop the
+  application while they work and start it again whatever happens, and CI
+  runs them: a marker written after a backup must be gone once that backup
+  is restored, for the database and for the application data. The tests
+  used to restore with their own copy of the commands, which is how the
+  shipped scripts could drift while every run was green.
+
 ### Changed
 
 - **The freshness check has its own workflow, Pin Freshness.** It ran inside Deployment Verification, whose badge is the one at the top of this README. Across the fleet, nine red runs in ten were a pin one version behind - which the fleet's triage moves within the day - and a reader cannot tell that from a stack that does not boot. The badge now says whether the stack boots. The job itself is unchanged.

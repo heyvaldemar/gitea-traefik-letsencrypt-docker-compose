@@ -1,46 +1,60 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# gitea-restore-database.sh [backup-file-name]
+#
+# Replaces the Gitea database with one of the dumps the backups service wrote.
+#
+#   ./gitea-restore-database.sh               list and ask
+#   ./gitea-restore-database.sh <file-name>   restore that one
+#
+# EVERY PATH, NAME AND CREDENTIAL COMES FROM THE RUNNING BACKUPS CONTAINER.
+# The previous version carried giteadb and giteadbuser as literals and its own
+# copy of the backup directory, so any of the three set differently in .env
+# pointed it at a database or directory the stack does not use.
+# The backup loop reads its own environment, so this reads the same one, and
+# the two cannot disagree.
+#
+# CI runs this exact file against a marker written after the backup it
+# restores, and requires the marker to be gone.
+#
+# Set COMPOSE_PROJECT_NAME if the stack was started with a -p other than gitea.
+set -Eeuo pipefail
 
-# # gitea-restore-database.sh Description
-# This script facilitates the restoration of a database backup.
-# 1. **Identify Containers**: It first identifies the service and backups containers by name, finding the appropriate container IDs.
-# 2. **List Backups**: Displays all available database backups located at the specified backup path.
-# 3. **Select Backup**: Prompts the user to copy and paste the desired backup name from the list to restore the database.
-# 4. **Stop Service**: Temporarily stops the service to ensure data consistency during restoration.
-# 5. **Restore Database**: Executes a sequence of commands to drop the current database, create a new one, and restore it from the selected compressed backup file.
-# 6. **Start Service**: Restarts the service after the restoration is completed.
-# To make the `gitea-restore-database.shh` script executable, run the following command:
-# `chmod +x gitea-restore-database.sh`
-# Usage of this script ensures a controlled and guided process to restore the database from an existing backup.
+PROJECT="${COMPOSE_PROJECT_NAME:-gitea}"
+APP_SERVICE="gitea"
 
-GITEA_CONTAINER=$(docker ps -aqf "name=gitea-gitea")
-GITEA_BACKUPS_CONTAINER=$(docker ps -aqf "name=gitea-backups")
-GITEA_DB_NAME="giteadb"
-GITEA_DB_USER="giteadbuser"
-BACKUP_PATH="/srv/gitea-postgres/backups/"
+cid() {  # the container of one compose service in this project
+  docker ps -aq --filter "label=com.docker.compose.project=$PROJECT" \
+    --filter "label=com.docker.compose.service=$1" | head -n 1
+}
+APP="$(cid "$APP_SERVICE")"; BKP="$(cid backups)"
+[ -n "$BKP" ] || { echo "error: no backups container in compose project '$PROJECT' (set COMPOSE_PROJECT_NAME)" >&2; exit 1; }
+[ -n "$APP" ] || { echo "error: no $APP_SERVICE container in compose project '$PROJECT'" >&2; exit 1; }
+[ "$(docker inspect -f '{{.State.Running}}' "$BKP")" = true ] || { echo "error: the backups container is not running" >&2; exit 1; }
 
-echo "--> All available database backups:"
+env_of() { docker exec "$BKP" printenv "$1"; }
+DIR="$(env_of POSTGRES_BACKUPS_PATH)"; NAME="$(env_of POSTGRES_BACKUP_NAME)"
+DB_NAME="$(env_of GITEA_DB_NAME)"; DB_USER="$(env_of GITEA_DB_USER)"
 
-for entry in $(docker container exec "$GITEA_BACKUPS_CONTAINER" sh -c "ls $BACKUP_PATH")
-do
-  echo "$entry"
-done
+SELECTED="${1:-}"
+if [ -z "$SELECTED" ]; then
+  echo "Database backups in $DIR:"
+  docker exec "$BKP" sh -c "ls -1 '$DIR' | grep -E '^$NAME-.*\\.gz\$'" || { echo "  none found" >&2; exit 1; }
+  read -r -p "File name to restore: " SELECTED
+fi
+case "$SELECTED" in ""|*/*) echo "error: give a file name from the list, not a path" >&2; exit 1 ;; esac
+docker exec "$BKP" gunzip -t "$DIR/$SELECTED" >/dev/null \
+  || { echo "error: $DIR/$SELECTED is missing or does not open; nothing was changed" >&2; exit 1; }
 
-echo "--> Copy and paste the backup name from the list above to restore database and press [ENTER]
---> Example: gitea-postgres-backup-YYYY-MM-DD_hh-mm.gz"
-echo -n "--> "
-
-read -r SELECTED_DATABASE_BACKUP
-
-echo "--> $SELECTED_DATABASE_BACKUP was selected"
-
-echo "--> Stopping service..."
-docker stop "$GITEA_CONTAINER"
-
-echo "--> Restoring database..."
-docker exec "$GITEA_BACKUPS_CONTAINER" sh -c "dropdb -h postgres -p 5432 $GITEA_DB_NAME -U $GITEA_DB_USER \
-&& createdb -h postgres -p 5432 $GITEA_DB_NAME -U $GITEA_DB_USER \
-&& gunzip -c ${BACKUP_PATH}${SELECTED_DATABASE_BACKUP} | psql -h postgres -p 5432 $GITEA_DB_NAME -U $GITEA_DB_USER"
-echo "--> Database recovery completed..."
-
-echo "--> Starting service..."
-docker start "$GITEA_CONTAINER"
+echo "Stopping $APP_SERVICE so nothing writes while the database is replaced"
+docker stop "$APP" >/dev/null
+restart() { docker start "$APP" >/dev/null && echo "Started $APP_SERVICE"; }
+trap 'restart' EXIT
+echo "Restoring $SELECTED"
+if ! docker exec "$BKP" sh -c "(set -o pipefail) 2>/dev/null && set -o pipefail; set -eu
+    dropdb --force -h postgres -U '$DB_USER' --if-exists '$DB_NAME'
+    createdb -h postgres -U '$DB_USER' '$DB_NAME'
+    gunzip -c '$DIR/$SELECTED' | psql -q -v ON_ERROR_STOP=1 -h postgres -U '$DB_USER' -d '$DB_NAME' >/dev/null"; then
+  echo "error: the restore failed part-way. The database may now be empty: restore another backup before using Gitea." >&2
+  exit 1
+fi
+echo "Restored $SELECTED into $DB_NAME"
