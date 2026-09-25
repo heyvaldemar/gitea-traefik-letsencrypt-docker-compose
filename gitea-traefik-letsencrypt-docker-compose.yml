@@ -7,7 +7,7 @@
 # the pins from these lines — this block is the single source of truth.
 x-images:
   traefik: &traefik-image ${TRAEFIK_IMAGE_TAG:-traefik:${TRAEFIK_IMAGE_VERSION:-3.7@sha256:24841fe2de7304c149343d877d2923b4c8800a38ba015dea9174c23b20e344a0}}
-  postgres: &postgres-image ${GITEA_POSTGRES_IMAGE_TAG:-postgres:${GITEA_POSTGRES_IMAGE_VERSION:-15@sha256:724292da1f2e50bdccfc3302ce75bbba7f4a6076701b588cc795fcac65683550}}
+  postgres: &postgres-image ${GITEA_POSTGRES_IMAGE_TAG:-postgres:${GITEA_POSTGRES_IMAGE_VERSION:-15@sha256:dfbbb0ad8cab91d41e99123664e37a9b25d0413426d4fb3154e4d668e5d35246}}
   gitea: &gitea-image ${GITEA_IMAGE_TAG:-gitea/gitea:${GITEA_IMAGE_VERSION:-1.27.3@sha256:87a67ee09d3ae0d1df5fda5dcda3e2a1f9236a45b0a59025d6e00e46adc43bef}}
 
 networks:
