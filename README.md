@@ -106,7 +106,7 @@ docker compose -f gitea-traefik-letsencrypt-docker-compose.yml -p gitea up -d --
 
 ## Features
 
-- **Gitea** latest stable (1.27.3): repositories, issues, pull requests, actions, packages.
+- **Gitea** latest stable (28.0.0): repositories, issues, pull requests, actions, packages.
 - **PostgreSQL** backing store with healthcheck and start-order dependency.
 - **Traefik v3** reverse proxy with automatic HTTP→HTTPS redirect and Let's Encrypt TLS-ALPN certificate issuance.
 - **Git-over-SSH via a dedicated Traefik TCP entrypoint** on port 2222: no host-level SSH conflicts.
