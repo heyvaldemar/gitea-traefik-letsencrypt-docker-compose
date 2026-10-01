@@ -7,7 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_(no unreleased changes yet)_
+## [2.0.0] - 2026-10-01
+
+### Changed
+
+- **Gitea 28.** The release after 1.27.3, numbered 28.0.0. Two of its changes
+  alter behaviour on an existing forge, and this template takes one of them
+  out of your hands.
+
+  **Actions run history is kept.** Gitea 28 adds `RUN_RETENTION_DAYS` and
+  defaults it to 400: completed Actions runs older than that are deleted at
+  the next midnight cron ([go-gitea/gitea#38855](https://github.com/go-gitea/gitea/pull/38855)).
+  1.27 kept them for ever. The compose file sets it to `0`, which keeps
+  everything, so pulling this release deletes nothing. Set
+  `GITEA_ACTIONS_RUN_RETENTION_DAYS=400` in `.env` to take upstream's default,
+  which matches how long GitHub keeps run history. The deploy job reads the
+  value the running instance loaded and fails if it is not `0`.
+
+  **Outbound git goes through an internal proxy** ([go-gitea/gitea#39426](https://github.com/go-gitea/gitea/pull/39426)).
+  Migrations, mirrors and LFS fetches from other hosts now pass through it.
+  In the default `lax` mode, `[security] ALLOWED_HOST_LIST` no longer
+  restricts public hosts; `ALLOWED_DOMAINS`, `BLOCKED_DOMAINS` and
+  `ALLOW_LOCALNETWORKS` under `[migrations]` are deprecated; `*` and IP
+  wildcards are no longer accepted in those lists, and an invalid blocked
+  entry stops the start. This template sets none of them, so nothing changes
+  here. If you added any through `GITEA__...` variables, read that pull
+  request before upgrading.
+
+  **The schema migrates on first start, and the way back is a restore.** That
+  is why this is a major here. The `backups` service takes the database and
+  the data volume; confirm a recent one exists before pulling this on a live
+  forge. `./update.sh` does not cross a major version unattended.
+
+  CI starts v1.9.0 (Gitea 1.27.3) first on the same volumes, then this
+  release on top of them, and runs the backup and restore tests against the
+  upgraded instance.
+
+- **`gitea/gitea:1.27.3` moved to `gitea/gitea:28.0.0`.** The freshness check reported the lag; the deploy job booted the stack on the new image before this landed.
+
+### Added
+
+- **`GITEA_ACTIONS_RUN_RETENTION_DAYS`**, default `0`. How long Gitea keeps
+  completed Actions runs; see the entry above.
 
 ## [1.9.0] - 2026-09-26
 
@@ -241,7 +282,8 @@ v1.2.0.
 
 - Shellcheck findings in both restore scripts.
 
-[Unreleased]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v1.9.0...v2.0.0
 [1.9.0]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v1.8.6...v1.9.0
 [1.8.4]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v1.8.2...v1.8.3

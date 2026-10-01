@@ -106,7 +106,7 @@ docker compose -f gitea-traefik-letsencrypt-docker-compose.yml -p gitea up -d --
 
 ## Features
 
-- **Gitea** latest stable (1.27.3): repositories, issues, pull requests, actions, packages.
+- **Gitea** latest stable (28.0.0): repositories, issues, pull requests, actions, packages.
 - **PostgreSQL** backing store with healthcheck and start-order dependency.
 - **Traefik v3** reverse proxy with automatic HTTP→HTTPS redirect and Let's Encrypt TLS-ALPN certificate issuance.
 - **Git-over-SSH via a dedicated Traefik TCP entrypoint** on port 2222: no host-level SSH conflicts.
@@ -135,6 +135,8 @@ Add your public key in Gitea (Settings → SSH / GPG Keys) first. HTTPS clones w
 ## Updating
 
 `./update.sh` moves this checkout to the latest release tag — a combination this repository's CI has booted, upgraded from the previous release on the same volumes, and smoke-tested — and then runs `docker compose up -d`. It refuses to cross a major version unattended, refuses to run over local changes, and names any variable that became required since your version before anything has moved. `./update.sh --dry-run` says what would happen. Every release cut by fleet triage also carries what upstream changed, read from its release notes against this compose file.
+
+**From 1.x to 2.0.** Version 2.0 moves Gitea from 1.27 to 28. The schema migrates on the first start of the new image and the only way back is a restore, so take a backup first. Gitea 28 changes two behaviours; the [changelog](CHANGELOG.md#200---2026-10-01) says what each one does and what this template does about it.
 
 ## Supply chain trust
 
