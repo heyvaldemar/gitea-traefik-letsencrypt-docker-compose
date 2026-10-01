@@ -136,6 +136,8 @@ Add your public key in Gitea (Settings → SSH / GPG Keys) first. HTTPS clones w
 
 `./update.sh` moves this checkout to the latest release tag — a combination this repository's CI has booted, upgraded from the previous release on the same volumes, and smoke-tested — and then runs `docker compose up -d`. It refuses to cross a major version unattended, refuses to run over local changes, and names any variable that became required since your version before anything has moved. `./update.sh --dry-run` says what would happen. Every release cut by fleet triage also carries what upstream changed, read from its release notes against this compose file.
 
+**From 1.x to 2.0.** Version 2.0 moves Gitea from 1.27 to 28. The schema migrates on the first start of the new image and the only way back is a restore, so take a backup first. Gitea 28 changes two behaviours; the [changelog](CHANGELOG.md#200---2026-10-01) says what each one does and what this template does about it.
+
 ## Supply chain trust
 
 This repository is a deployment template, not a custom Docker image. It orchestrates three upstream images:

@@ -109,6 +109,11 @@ services:
       GITEA__server__SSH_PORT: ${GITEA_SHELL_SSH_PORT:-2222}
       GITEA__server__SSH_LISTEN_PORT: 22
 
+      # Actions run history. Gitea 28 deletes completed runs older than
+      # RUN_RETENTION_DAYS at midnight, and upstream defaults it to 400. 0
+      # keeps them, as 1.27 did: an upgrade does not delete history on its own.
+      GITEA__actions__RUN_RETENTION_DAYS: ${GITEA_ACTIONS_RUN_RETENTION_DAYS:-0}
+
       # General
       RUN_MODE: prod
 

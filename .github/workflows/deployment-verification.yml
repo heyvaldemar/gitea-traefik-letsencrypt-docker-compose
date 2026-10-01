@@ -218,6 +218,22 @@ jobs:
           curl -fsk "https://$APP_HOSTNAME/api/healthz"
           curl -fskL "https://$APP_HOSTNAME/" -o /dev/null -w "Gitea front page: %{http_code}\n"
 
+      - name: Prove the Actions run history is kept
+        # Gitea 28 deletes completed Actions runs older than RUN_RETENTION_DAYS
+        # (upstream default 400) at midnight. The template sets 0, as 1.27
+        # behaved. This reads the value the running instance loaded, after the
+        # upgrade drill, so a renamed variable or a lost env line fails here
+        # and not on somebody's history.
+        run: |
+          v="$(docker compose -f "$DOCKER_COMPOSE_FILE" -p "$COMPOSE_PROJECT_NAME" exec -T gitea \
+                 sed -n '/^\[actions\]/,/^\[/p' /data/gitea/conf/app.ini \
+               | awk -F= '/^RUN_RETENTION_DAYS/ {gsub(/[[:space:]]/, "", $2); print $2}')"
+          echo "RUN_RETENTION_DAYS in app.ini: ${v:-absent}"
+          if [ "$v" != "0" ]; then
+            echo "::error::Gitea would delete old Actions runs: RUN_RETENTION_DAYS is '${v:-absent}', expected 0"
+            exit 1
+          fi
+
       - name: Verify a backup is produced and valid
         # Log-driven: the file named in a 'backup OK' line is complete by
         # definition, so this never races a dump that is still being written.
