@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_(no unreleased changes yet)_
+
+## [2.0.6] - 2026-10-19
+
 ### Changed
 
 - **`gitea/gitea:28.1.0` moved to `gitea/gitea:28.2.0`.** The freshness check reported the lag; the deploy job booted the stack on the new image before this landed.
@@ -329,7 +333,8 @@ v1.2.0.
 
 - Shellcheck findings in both restore scripts.
 
-[Unreleased]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.5...HEAD
+[Unreleased]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.6...HEAD
+[2.0.6]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.2...v2.0.3
