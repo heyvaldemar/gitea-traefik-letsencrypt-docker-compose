@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_(no unreleased changes yet)_
+
+## [2.0.21] - 2026-11-14
+
 ### Security
 
 - **`traefik:3.7` was rebuilt upstream**; the pin moved from `sha256:c1ea95f3b3ea…` to `sha256:b7b1b31e6440…`. Same version, same tag, a rebuilt base image — the usual shape of a security fix in a base layer.
@@ -429,7 +433,8 @@ v1.2.0.
 
 - Shellcheck findings in both restore scripts.
 
-[Unreleased]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.20...HEAD
+[Unreleased]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.21...HEAD
+[2.0.21]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.20...v2.0.21
 [2.0.20]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.19...v2.0.20
 [2.0.19]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.18...v2.0.19
 [2.0.18]: https://github.com/heyvaldemar/gitea-traefik-letsencrypt-docker-compose/compare/v2.0.17...v2.0.18
