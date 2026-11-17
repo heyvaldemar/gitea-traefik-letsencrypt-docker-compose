@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_(no unreleased changes yet)_
+### Changed
+
+- **`gitea/gitea:28.3.0` moved to `gitea/gitea:28.4.0`.** The freshness check reported the lag; the deploy job booted the stack on the new image before this landed.
 
 ## [2.0.21] - 2026-11-14
 

@@ -8,7 +8,7 @@
 x-images:
   traefik: &traefik-image ${TRAEFIK_IMAGE_TAG:-traefik:${TRAEFIK_IMAGE_VERSION:-3.7@sha256:b7b1b31e6440de0b1f7c4e0f6cf0a0f3f004866761d30c025fe00c80daaf7d9c}}
   postgres: &postgres-image ${GITEA_POSTGRES_IMAGE_TAG:-postgres:${GITEA_POSTGRES_IMAGE_VERSION:-15@sha256:5a407822929c3789ff5154d3d35bd7e2090318149344c8a3d4ca942b035822ed}}
-  gitea: &gitea-image ${GITEA_IMAGE_TAG:-gitea/gitea:${GITEA_IMAGE_VERSION:-28.3.0@sha256:8967bf9deaf3c5c4adae13519436dc1b20c646ac83fe37ae810c933a1045227d}}
+  gitea: &gitea-image ${GITEA_IMAGE_TAG:-gitea/gitea:${GITEA_IMAGE_VERSION:-28.4.0@sha256:aa90e8f00b755b0d665214ab9c14447ea44d3190dbe6b6d0cb46cd9c4f55d309}}
 
 networks:
   gitea-network:
